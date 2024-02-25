@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# This will check this file's current directory, attempt to download,
-# abstract, and create directories for the COCO dataset
+# This will check this file's current directory, and attempt to
+# delete zip files given their supposed names
 SCRIPT_DIR=$(realpath $(dirname $0))
 
 TRAIN_ZIP="coco_train2017.zip"
