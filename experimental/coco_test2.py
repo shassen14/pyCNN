@@ -16,13 +16,30 @@ annFile = "{}/annotations/instances_{}.json".format(dataDir, dataType)
 coco = COCO(annFile)
 
 # get all images
-imgIds = coco.getImgIds()
-img = coco.loadImgs(imgIds)
+ids = list(sorted(coco.imgs.keys()))
+imgIds = coco.getImgIds(ids)
+imgs = coco.loadImgs(imgIds)
+annIds = coco.getAnnIds(imgIds=imgIds)
+anns = coco.loadAnns(annIds)
 
-for info in img:
+for id in ids:
+    img = coco.loadImgs(id)
+    target = coco.loadAnns(coco.getAnnIds(id))
+
+
+# print(len(imgs))
+# print("\n\n")
+# print(anns)
+
+
+# print(len(keys))
+
+# print(bob)
+"""
+for info, ann in bob:
     # obtain hardcoded file path
-    image_path = "./data/coco/" + dataType + "/" + info["file_name"]
-
+    image_path = dataDir + dataType + "/" + info["file_name"]
+    print(info)
     image = cv2.imread(image_path)
     image_resize = cv2.resize(image, (640, 480))
     # image_concat = np.concatenate((image, image_resize), axis)
@@ -43,3 +60,4 @@ for info in img:
         break
     else:
         continue
+"""
