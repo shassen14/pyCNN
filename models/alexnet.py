@@ -19,7 +19,7 @@ class AlexNet(nn.Module):
         # MaxPool2d lead to (N, 96, 55, 55) -> (N, 96, 27, 27)
         self.layer1 = nn.Sequential(
             nn.Conv2d(
-                in_channels=3, out_channels=96, kernel_size=11, stride=4, padding=0
+                in_channels=3, out_channels=96, kernel_size=11, stride=4, padding=2
             ),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=3, stride=2),
@@ -74,13 +74,30 @@ class AlexNet(nn.Module):
             nn.ReLU(),
             nn.Linear(in_features=4096, out_features=num_classes),
         )
+        self.layer1.apply(self.init_weights)
+        self.layer2.apply(self.init_weights)
+        self.layer3.apply(self.init_weights)
+        self.layer4.apply(self.init_weights)
+        self.layer5.apply(self.init_weights)
+        self.fc.apply(self.init_weights)
+
+    def init_weights(self, layer):
+        if type(layer) == nn.Linear or type(layer) == nn.Conv2d:
+            nn.init.xavier_uniform_(layer.weight)
 
     def forward(self, x):
+        # print("Input: {}".format(x.shape))
         out = self.layer1(x)
+        # print("After Layer 1: {}".format(out.shape))
         out = self.layer2(out)
+        # print("After Layer 2: {}".format(out.shape))
         out = self.layer3(out)
+        # print("After Layer 3: {}".format(out.shape))
         out = self.layer4(out)
+        # print("After Layer 4: {}".format(out.shape))
         out = self.layer5(out)
+        # print("After Layer 5: {}".format(out.shape))
         out = torch.flatten(out, 1)
+        # print("After Flatten: {}".format(out.shape))
         out = self.fc(out)
         return out

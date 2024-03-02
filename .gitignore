@@ -138,6 +138,7 @@ cython_debug/
 # Datasets
 data/coco/*/
 data/imagenet/*/
+data/MNIST/*/
 *.bin
 *.tar
 *.tar.gz
