@@ -139,6 +139,8 @@ cython_debug/
 data/coco/*/
 data/imagenet/*/
 data/MNIST/*/
+data/FashionMNIST/*/
+data/tiny-imagenet-200/*/
 *.bin
 *.tar
 *.tar.gz
