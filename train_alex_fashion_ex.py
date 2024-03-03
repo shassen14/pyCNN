@@ -91,11 +91,11 @@ if __name__ == "__main__":
 
     # Create dataset for both training and validation
     train_dir = config.dataset_dir + config.train_dir
-    train_dataset = data.mnist_train_dataset
+    train_dataset = data.fashion_train_dataset
     train_dataset.transform = transform_train
 
     val_dir = config.dataset_dir + config.val_dir
-    val_dataset = data.mnist_val_dataset
+    val_dataset = data.fashion_val_dataset
     val_dataset.transform = transform_val
 
     # dataloaders
