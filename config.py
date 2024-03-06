@@ -16,25 +16,24 @@ class Config:
 
     # Dataset to utilize
 
-    dataset_dir: str        = "data/imagenet/"
+    dataset_dir: str        = "data/tiny-imagenet-200/"
     train_dir: str          = "train"
     val_dir: str            = "val"
     dir_array: List[str]   = field(default_factory=lambda: [Config.train_dir, Config.val_dir])
 
     # Parameter Save/Load
-    param_dir: str          = "params"
+    param_dir: str          = "params/"
     pt_file: str            = "alexnet_init.pt"
 
     ############################## Paramaters #####################################
     # Model
-    classes: int            = 1000
-    dropout: float          = 0.2
+    dropout: float          = 0.5
 
     # Optimizer
     learning_rate: float    = 0.0001
 
     # training
-    epochs: int             = 6
+    epochs: int             = 100
     batch_size: int         = 128
 
     # get device type. get GPU or apple if possible
