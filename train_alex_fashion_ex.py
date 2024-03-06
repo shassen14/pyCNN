@@ -4,10 +4,10 @@ from models.alexnet import AlexNet
 from torchvision import datasets, transforms
 import torch
 import torch.nn as nn
+import utils
 
 # TODO: delete later
 import torch.utils.data
-import cv2
 from data import data
 
 
@@ -50,7 +50,7 @@ def validate(model, val_loader, device):
             pred = output.argmax(dim=1, keepdim=True)
             correct += pred.eq(labels.view_as(pred)).sum().item()
 
-    test_loss /= len(val_loader.dataset)
+    test_loss /= len(val_loader.dataset) / val_loader.batch_size
     accuracy = 100.0 * correct / len(val_loader.dataset)
     print(
         "\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n".format(
@@ -62,6 +62,7 @@ def validate(model, val_loader, device):
 if __name__ == "__main__":
     # obtain config values
     config = cfg.Config
+    pt_path = utils.get_file_path(config.param_dir, config.pt_file)
 
     # Create transforms for preprocessing images to input into models
     # TODO: might be good to have these things in configs to change between models
@@ -122,5 +123,5 @@ if __name__ == "__main__":
         train(model, train_loader, optimizer, criterion, epoch, config.device_type)
         validate(model, val_loader, config.device_type)
         lr_scheduler.step()
-        torch.save(model.state_dict(), config.pt_file)
+        torch.save(model.state_dict(), pt_path)
         print("Model saved")
