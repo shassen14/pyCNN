@@ -1,3 +1,4 @@
 numpy>=1.26.4
+scipy>=1.12.0
 torch>=2.2.0
-torchvision>=0.17
+torchvision>=0.17.0
