@@ -1,5 +1,5 @@
 import config as cfg
-from models.alexnet import AlexNet
+from models.classifiers import AlexNet
 
 from torchvision import datasets, transforms
 import torch

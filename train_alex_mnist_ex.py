@@ -1,5 +1,5 @@
 import config as cfg
-from models.alexnet import AlexNet
+from models.classifiers import AlexNet
 
 from torchvision import datasets, transforms
 import torch
@@ -106,7 +106,6 @@ if __name__ == "__main__":
     val_loader = torch.utils.data.DataLoader(
         val_dataset, batch_size=config.batch_size, shuffle=False, num_workers=4
     )
-    
 
     # model
     model = AlexNet(len(train_dataset.classes), config.dropout)

@@ -1,7 +1,7 @@
 import config as cfg
 from models.classifiers import AlexNet
 
-from torchvision import datasets, transforms
+from torchvision import datasets, models, transforms
 import torch
 import torch.nn as nn
 import utils
@@ -94,7 +94,6 @@ if __name__ == "__main__":
 
     val_dir = config.dataset_dir + config.val_dir
     val_dataset = datasets.ImageFolder(val_dir, transform=transform_val)
-    # val_dataset.transform = transform_val
 
     # dataloaders
     train_loader = torch.utils.data.DataLoader(
@@ -105,20 +104,21 @@ if __name__ == "__main__":
     )
 
     # model
-    model = AlexNet(len(train_dataset.classes), config.dropout)
+    model = models.alexnet(weights=models.AlexNet_Weights.DEFAULT)
+    # model = AlexNet(len(train_dataset.classes), config.dropout)
     model.to(config.device_type)
 
     # optimizer
     optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate)
-    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=2, gamma=0.1)
+    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
 
     # loss criterion
     criterion = nn.CrossEntropyLoss().to(config.device_type)
 
     # training
     for epoch in range(1, config.epochs + 1):
-        train(model, train_loader, optimizer, criterion, epoch, config.device_type)
+        # train(model, train_loader, optimizer, criterion, epoch, config.device_type)
         validate(model, val_loader, config.device_type)
-        lr_scheduler.step()
+        # lr_scheduler.step()
         torch.save(model.state_dict(), pt_path)
         print("Model saved")

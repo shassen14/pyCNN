@@ -16,7 +16,7 @@ class Config:
 
     # Dataset to utilize
 
-    dataset_dir: str        = "data/tiny-imagenet-200/"
+    dataset_dir: str        = "data/imagenet/"
     train_dir: str          = "train"
     val_dir: str            = "val"
     dir_array: List[str]   = field(default_factory=lambda: [Config.train_dir, Config.val_dir])
