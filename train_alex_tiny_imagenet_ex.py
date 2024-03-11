@@ -1,7 +1,7 @@
 import config as cfg
 from models.classifiers import AlexNet
 
-from torchvision import datasets, transforms
+from torchvision import datasets, transforms, models
 import torch
 import torch.nn as nn
 import utils
@@ -37,7 +37,7 @@ def train(model, train_loader, optimizer, criterion, epoch, device):
             )
 
 
-def validate(model, val_loader, device):
+def validate(model, val_loader, criterion, device):
     model.eval()
     test_loss = 0
     correct = 0
@@ -105,7 +105,9 @@ if __name__ == "__main__":
     )
 
     # model
-    model = AlexNet(len(train_dataset.classes), config.dropout)
+    model = models.alexnet(weights=models.AlexNet_Weights.DEFAULT)
+
+    # model = AlexNet(len(train_dataset.classes), config.dropout)
     model.to(config.device_type)
 
     # optimizer
@@ -117,8 +119,8 @@ if __name__ == "__main__":
 
     # training
     for epoch in range(1, config.epochs + 1):
-        train(model, train_loader, optimizer, criterion, epoch, config.device_type)
-        validate(model, val_loader, config.device_type)
-        lr_scheduler.step()
+        # train(model, train_loader, optimizer, criterion, epoch, config.device_type)
+        validate(model, val_loader, criterion, config.device_type)
+        # lr_scheduler.step()
         torch.save(model.state_dict(), pt_path)
         print("Model saved")
