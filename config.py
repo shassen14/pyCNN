@@ -15,8 +15,7 @@ class Config:
     initialize: str         = "start"
 
     # Dataset to utilize
-
-    dataset_dir: str        = "data/imagenet/"
+    dataset_dir: str        = "data/tiny-imagenet-200/"
     train_dir: str          = "train"
     val_dir: str            = "val"
     dir_array: List[str]   = field(default_factory=lambda: [Config.train_dir, Config.val_dir])
@@ -31,8 +30,10 @@ class Config:
 
     # Optimizer
     learning_rate: float    = 0.0001
+    step_size: int          = 2
+    gamma: float            = 0.5
 
-    # training
+    # Training
     epochs: int             = 100
     batch_size: int         = 128
 
