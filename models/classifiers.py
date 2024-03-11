@@ -66,14 +66,15 @@ class AlexNet(nn.Module):
 
         """ Classifier is this fully connected neural network which has 3 linear layers"""
         self.fc = nn.Sequential(
-            nn.Dropout(p=dropout),
             nn.Linear(256 * 6 * 6, 4096),
             nn.ReLU(),
             nn.Dropout(p=dropout),
             nn.Linear(4096, 4096),
             nn.ReLU(),
+            nn.Dropout(p=dropout),
             nn.Linear(in_features=4096, out_features=num_classes),
         )
+
         self.layer1.apply(self.init_weights)
         self.layer2.apply(self.init_weights)
         self.layer3.apply(self.init_weights)
@@ -86,18 +87,11 @@ class AlexNet(nn.Module):
             nn.init.xavier_uniform_(layer.weight)
 
     def forward(self, x):
-        # print("Input: {}".format(x.shape))
         out = self.layer1(x)
-        # print("After Layer 1: {}".format(out.shape))
         out = self.layer2(out)
-        # print("After Layer 2: {}".format(out.shape))
         out = self.layer3(out)
-        # print("After Layer 3: {}".format(out.shape))
         out = self.layer4(out)
-        # print("After Layer 4: {}".format(out.shape))
         out = self.layer5(out)
-        # print("After Layer 5: {}".format(out.shape))
         out = torch.flatten(out, 1)
-        # print("After Flatten: {}".format(out.shape))
         out = self.fc(out)
         return out
