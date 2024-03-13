@@ -19,7 +19,7 @@ class Config:
     model_name: str         = "AlexNet"
 
     # Parameter Save/Load
-    param_dir: str          = "params/"
+    param_dir: str          = "params"
     pt_file: str            = model_name + "_" + dataset_name + ".pt"
 
     ############################## Paramaters #####################################

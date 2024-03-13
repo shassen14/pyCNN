@@ -150,7 +150,7 @@ def validate(model, val_loader, criterion, device):
     test_loss /= len(val_loader.dataset) / val_loader.batch_size
     accuracy = 100.0 * correct / len(val_loader.dataset)
     print(
-        "\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n".format(
+        "\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)".format(
             test_loss, correct, len(val_loader.dataset), accuracy
         )
     )

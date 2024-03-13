@@ -21,7 +21,6 @@ pt_path = utils.get_file_path(config.param_dir, config.pt_file)
 transform_train, transform_val = utils.get_transforms(
     config.model_name, config.dataset_name
 )
-print((transform_val))
 
 # Create dataset for both training and validation
 train_dataset, val_dataset = utils.get_datasets(data_dir, config.dataset_name)
@@ -41,6 +40,7 @@ model = utils.get_model(config.model_name, train_dataset, config)
 model.to(config.device_type)
 
 # optimizer
+# TODO: write a get_optimizer function in utils? to experiment which ones work well?
 optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate)
 lr_scheduler = torch.optim.lr_scheduler.StepLR(
     optimizer, step_size=config.step_size, gamma=config.gamma
@@ -55,4 +55,4 @@ for epoch in range(1, config.epochs + 1):
     utils.validate(model, val_loader, criterion, config.device_type)
     lr_scheduler.step()
     torch.save(model.state_dict(), pt_path)
-    print("Model saved")
+    print("Model saved to {}\n".format(pt_path))
