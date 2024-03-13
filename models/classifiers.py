@@ -73,7 +73,7 @@ class AlexNet(nn.Module):
             nn.Dropout(p=dropout),
             nn.Linear(in_features=4096, out_features=num_classes),
         )
-
+        # TODO: is init_weights necessary?
         self.layer1.apply(self.init_weights)
         self.layer2.apply(self.init_weights)
         self.layer3.apply(self.init_weights)
@@ -86,11 +86,133 @@ class AlexNet(nn.Module):
             nn.init.xavier_uniform_(layer.weight)
 
     def forward(self, x):
-        out = self.layer1(x)
-        out = self.layer2(out)
-        out = self.layer3(out)
-        out = self.layer4(out)
-        out = self.layer5(out)
-        out = torch.flatten(out, 1)
-        out = self.fc(out)
-        return out
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        x = self.layer5(x)
+        x = torch.flatten(x, 1)
+        x = self.fc(x)
+        return x
+
+
+class VGG16(nn.Module):
+    """Same input of 224x224 3 channel image"""
+
+    def __init__(self, num_classes: int, dropout: float):
+        super().__init__()
+        """ Features = layer1, layer2, layer3 """
+        # H_out = [H_in + 2p - k]/s + 1 -> floor((224 + 2*1 - 3) / 1) + 1 = 224
+        # Convd2d leads to (N, 3, 224, 224) -> (N, 64, 224, 224)
+        # H_out = floor((224 + 2*0 - 2)/2 + 1) = 112
+        # MaxPool2d lead to (N, 64, 224, 224) -> (N, 64, 112, 112)
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(
+                in_channels=3, out_channels=64, kernel_size=3, stride=1, padding=1
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=1
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+        )
+        # H_out = floor((112 + 2*1 - 3) / 1) + 1 = 112
+        # Convd2d leads to (N, 64, 112, 112) -> (N, 128, 112, 112)
+        # H_out = floor((112 + 2*0 - 2)/2 + 1) = 56
+        # MaxPool2d lead to (N, 128, 112, 112) -> (N, 128, 56, 56)
+        self.layer2 = nn.Sequential(
+            nn.Conv2d(
+                in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=128, out_channels=128, kernel_size=3, stride=1, padding=1
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+        )
+        # H_out = floor((56 + 2*1 - 3) / 1) + 1 = 56
+        # Convd2d leads to (N, 128, 56, 56) -> (N, 256, 56, 56)
+        # H_out = floor((56 + 2*0 - 2)/2 + 1) = 28
+        # MaxPool2d lead to (N, 256, 56, 56) -> (N, 256, 28, 28)
+        self.layer3 = nn.Sequential(
+            nn.Conv2d(
+                in_channels=128, out_channels=256, kernel_size=3, stride=1, padding=1
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+        )
+        # H_out = floor((56 + 2*1 - 3) / 1) + 1 = 56
+        # Convd2d leads to (N, 256, 28, 28) -> (N, 512, 28, 28)
+        # H_out = floor((28 + 2*0 - 2)/2 + 1) = 14
+        # MaxPool2d lead to (N, 512, 28, 28) -> (N, 512, 14, 14)
+        self.layer4 = nn.Sequential(
+            nn.Conv2d(
+                in_channels=256, out_channels=512, kernel_size=3, stride=1, padding=1
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+        )
+        # H_out = floor((28 + 2*1 - 3) / 1) + 1 = 14
+        # Convd2d leads to (N, 512, 14, 14) -> (N, 512, 14, 14)
+        # H_out = floor((14 + 2*0 - 2)/2 + 1) = 7
+        # MaxPool2d lead to (N, 512, 14, 14) -> (N, 512, 7, 7)
+        self.layer5 = nn.Sequential(
+            nn.Conv2d(
+                in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+        )
+
+        """ Classifier is this fully connected neural network which has 3 linear layers"""
+        self.fc = nn.Sequential(
+            nn.Linear(512 * 7 * 7, 4096),
+            nn.ReLU(),
+            nn.Dropout(p=dropout),
+            nn.Linear(4096, 4096),
+            nn.ReLU(),
+            nn.Dropout(p=dropout),
+            nn.Linear(in_features=4096, out_features=num_classes),
+        )
+
+    def forward(self, x):
+        # print("input: {}".format(x.shape))
+        x = self.layer1(x)
+        # print("after layer1: {}".format(x.shape))
+        x = self.layer2(x)
+        # print("after layer2: {}".format(x.shape))
+        x = self.layer3(x)
+        # print("after layer3: {}".format(x.shape))
+        x = self.layer4(x)
+        # print("after layer4: {}".format(x.shape))
+        x = self.layer5(x)
+        # print("after layer5: {}".format(x.shape))
+        x = torch.flatten(x, 1)
+        x = self.fc(x)
+        return x
