@@ -1,6 +1,6 @@
 import os
 import torch
-from torchvision import datasets
+from torchvision import datasets, transforms
 import torch.nn as nn
 import config as cfg
 
@@ -51,6 +51,42 @@ def get_datasets(
             "Dataset name, " + dataset_name + ", is not supported. Please correct."
         )
     return train_dataset, val_dataset
+
+
+###############################################################################
+# TODO: figure out a good way to input some values in for normalization, etc. Hardcoded transforms for now
+def get_transforms(
+    model_name: str, dataset_name: str
+) -> {transforms.Compose, transforms.Compose}:
+    """TODO: add descriptions"""
+    if model_name == "AlexNet":
+        normalize = transforms.Normalize(
+            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+        )
+        transform_train = transforms.Compose(
+            [
+                transforms.RandomResizedCrop(224),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                normalize,
+            ]
+        )
+        transform_val = transforms.Compose(
+            [
+                transforms.Resize(256),
+                transforms.CenterCrop(224),
+                transforms.ToTensor(),
+                normalize,
+            ]
+        )
+        if dataset_name == "MNIST" or dataset_name == "FashionMNIST":
+            transform_train = transforms.Compose(
+                [transforms.Grayscale(3), transform_train]
+            )
+            transform_val = transforms.Compose([transforms.Grayscale(3), transform_val])
+    else:
+        raise Exception("Model, " + model_name + ", is not supported.")
+    return transform_train, transform_val
 
 
 ###############################################################################

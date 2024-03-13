@@ -18,26 +18,10 @@ data_dir = utils.get_folder_path("data")
 pt_path = utils.get_file_path(config.param_dir, config.pt_file)
 
 # Create transforms for preprocessing images to input into models
-# TODO: might be good to have these things in configs to change between models
-normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-
-transform_train = transforms.Compose(
-    [
-        transforms.RandomResizedCrop(224),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        normalize,
-    ]
+transform_train, transform_val = utils.get_transforms(
+    config.model_name, config.dataset_name
 )
-
-transform_val = transforms.Compose(
-    [
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        normalize,
-    ]
-)
+print((transform_val))
 
 # Create dataset for both training and validation
 train_dataset, val_dataset = utils.get_datasets(data_dir, config.dataset_name)
