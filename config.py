@@ -13,14 +13,14 @@ class Config:
     initialize: str         = "start"
 
     # Dataset to utilize
-    dataset_name: str       = "tiny-imagenet-200"
+    dataset_name: str       = "MNIST"
 
     # Model to utilize
     model_name: str         = "AlexNet"
 
     # Parameter Save/Load
     param_dir: str          = "params/"
-    pt_file: str            = "alexnet_init.pt"
+    pt_file: str            = model_name + "_" + dataset_name + ".pt"
 
     ############################## Paramaters #####################################
     # Model
