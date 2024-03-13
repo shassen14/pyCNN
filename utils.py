@@ -1,5 +1,8 @@
 import os
 import torch
+from torchvision import datasets
+import torch.nn as nn
+import config as cfg
 
 
 ###############################################################################
@@ -15,6 +18,57 @@ def get_file_path(folder: str, file: str) -> str:
     """Obtain file path. Side effect is creating directory if it doesn't exist"""
     file_path = os.path.join(get_folder_path(folder), file)
     return file_path
+
+
+###############################################################################
+def get_datasets(
+    data_dir: str, dataset_name: str, train_dir: str = "train", val_dir: str = "val"
+) -> {datasets.DatasetFolder, datasets.DatasetFolder}:
+    """TODO: add descriptions"""
+    dataset_path = os.path.join(data_dir, dataset_name)
+    train_path = os.path.join(dataset_path, train_dir)
+    val_path = os.path.join(dataset_path, val_dir)
+
+    # TODO: download if not there?
+    if dataset_name == "tiny-imagenet-200":
+        print("Utilizing tiny-imagenet-200 dataset.")
+        train_dataset = datasets.ImageFolder(train_path)
+        val_dataset = datasets.ImageFolder(val_path)
+    elif dataset_name == "imagenet":
+        print("Utilizing imagenet dataset.")
+        train_dataset = datasets.ImageFolder(train_path)
+        val_dataset = datasets.ImageFolder(val_path)
+    elif dataset_name == "MNIST":
+        print("Utilizing MNIST dataset.")
+        train_dataset = datasets.MNIST(data_dir, train=True, download=True)
+        val_dataset = datasets.MNIST(data_dir, train=False, download=True)
+    elif dataset_name == "FashionMNIST":
+        print("Utilizing FashionMNIST dataset.")
+        train_dataset = datasets.FashionMNIST(data_dir, train=True, download=True)
+        val_dataset = datasets.FashionMNIST(data_dir, train=False, download=True)
+    else:
+        raise Exception(
+            "Dataset name, " + dataset_name + ", is not supported. Please correct."
+        )
+    return train_dataset, val_dataset
+
+
+###############################################################################
+# TODO: figure out a good way to input values for each model besides from the config
+def get_model(
+    model_name: str, dataset: datasets.DatasetFolder, config: cfg.Config
+) -> {nn.Module}:
+    """TODO: add descriptions"""
+    # fmt: off
+    if model_name == "AlexNet":
+        from models.classifiers import AlexNet
+        model = AlexNet(len(dataset.classes), dropout=config.dropout)
+    else:        
+        raise Exception(
+            "Model, " + model_name + ", is not supported."
+        )
+    # fmt: on
+    return model
 
 
 ###############################################################################

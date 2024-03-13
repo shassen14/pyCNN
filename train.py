@@ -12,7 +12,9 @@ from data import data
 
 
 # obtain config values
+# TODO: figure out how to do global directory instead of relative. hardcoded for now
 config = cfg.Config
+data_dir = utils.get_folder_path("data")
 pt_path = utils.get_file_path(config.param_dir, config.pt_file)
 
 # Create transforms for preprocessing images to input into models
@@ -38,12 +40,9 @@ transform_val = transforms.Compose(
 )
 
 # Create dataset for both training and validation
-# TODO: figure out obtaining different datasets. Not all are image folders
-train_dir = utils.get_folder_path(config.dataset_dir + config.train_dir)
-train_dataset = datasets.ImageFolder(train_dir, transform=transform_val)
-
-val_dir = utils.get_folder_path(config.dataset_dir + config.val_dir)
-val_dataset = datasets.ImageFolder(val_dir, transform=transform_val)
+train_dataset, val_dataset = utils.get_datasets(data_dir, config.dataset_name)
+train_dataset.transform = transform_train
+val_dataset.transform = transform_val
 
 # dataloaders
 train_loader = torch.utils.data.DataLoader(
@@ -54,8 +53,7 @@ val_loader = torch.utils.data.DataLoader(
 )
 
 # model
-# TODO: figure out initializing different models
-model = classifiers.AlexNet(len(train_dataset.classes), config.dropout)
+model = utils.get_model(config.model_name, train_dataset, config)
 model.to(config.device_type)
 
 # optimizer

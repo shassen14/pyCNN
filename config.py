@@ -2,9 +2,7 @@
 Choose configuration to use
 """
 
-from dataclasses import dataclass, field
-from typing import List
-
+from dataclasses import dataclass
 import torch
 
 
@@ -15,10 +13,10 @@ class Config:
     initialize: str         = "start"
 
     # Dataset to utilize
-    dataset_dir: str        = "data/tiny-imagenet-200/"
-    train_dir: str          = "train"
-    val_dir: str            = "val"
-    dir_array: List[str]   = field(default_factory=lambda: [Config.train_dir, Config.val_dir])
+    dataset_name: str       = "tiny-imagenet-200"
+
+    # Model to utilize
+    model_name: str         = "AlexNet"
 
     # Parameter Save/Load
     param_dir: str          = "params/"
