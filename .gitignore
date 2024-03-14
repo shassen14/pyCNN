@@ -144,3 +144,6 @@ data/tiny-imagenet-200/*/
 *.bin
 *.tar
 *.tar.gz
+
+# pytorch models
+*.pt
