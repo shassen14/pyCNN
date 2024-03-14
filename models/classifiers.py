@@ -202,17 +202,11 @@ class VGG16(nn.Module):
         )
 
     def forward(self, x):
-        # print("input: {}".format(x.shape))
         x = self.layer1(x)
-        # print("after layer1: {}".format(x.shape))
         x = self.layer2(x)
-        # print("after layer2: {}".format(x.shape))
         x = self.layer3(x)
-        # print("after layer3: {}".format(x.shape))
         x = self.layer4(x)
-        # print("after layer4: {}".format(x.shape))
         x = self.layer5(x)
-        # print("after layer5: {}".format(x.shape))
         x = torch.flatten(x, 1)
         x = self.fc(x)
         return x

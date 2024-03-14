@@ -157,3 +157,4 @@ def validate(model, val_loader, criterion, device):
             test_loss, correct, len(val_loader.dataset), accuracy
         )
     )
+    return test_loss
