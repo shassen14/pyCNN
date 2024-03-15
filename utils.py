@@ -1,8 +1,9 @@
+import config as cfg
 import os
+import argparse
 import torch
 from torchvision import datasets, transforms
 import torch.nn as nn
-import config as cfg
 
 
 ###############################################################################
@@ -158,3 +159,38 @@ def validate(model, val_loader, criterion, device):
         )
     )
     return test_loss
+
+
+def train_arg_parser(
+    parser: argparse.ArgumentParser, config: cfg.Config, pt_path: str
+) -> argparse.Namespace:
+    """
+    args.init
+    args.pt
+    args.lr
+    """
+    parser.add_argument(
+        "-lr",
+        "--learning_rate",
+        default=config.learning_rate,
+        type=float,
+        help="optimizer's initial learning rate",
+        dest="lr",
+    )
+    parser.add_argument(
+        "-pt",
+        "--pt_path",
+        default=pt_path,
+        type=str,
+        help="absolute path to the saved pytorch model",
+        dest="pt",
+    )
+    parser.add_argument(
+        "-i",
+        "--init",
+        default=config.initialize,
+        type=str,
+        help="absolute path to the saved pytorch model",
+        dest="init",
+    )
+    return parser.parse_args()
