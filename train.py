@@ -2,9 +2,11 @@ import config as cfg
 import utils
 
 import sys
+import argparse
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+
 
 # globals
 start_epoch = 1
@@ -15,6 +17,28 @@ best_val_loss = sys.float_info.max
 config = cfg.Config
 data_dir = utils.get_folder_path("data")
 pt_path = utils.get_file_path(config.param_dir, config.pt_file)
+
+# command line interface argument parser
+parser = argparse.ArgumentParser(description="PyTorch Training")
+parser.add_argument(
+    "-lr",
+    "--learning_rate",
+    default=config.learning_rate,
+    type=float,
+    help="optimizer's initial learning rate",
+    dest="lr",
+)
+parser.add_argument(
+    "-pt",
+    "--pt_path",
+    default=pt_path,
+    type=str,
+    help="absolute path to the saved pytorch model",
+    dest="pt",
+)
+
+args = parser.parse_args()
+print(args)
 
 if config.initialize == "start":
     print("Starting a new model")
@@ -34,7 +58,7 @@ if config.initialize == "start":
 
     # optimizer
     # TODO: write a get_optimizer function in utils? to experiment which ones work well?
-    optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
     # lr_scheduler = torch.optim.lr_scheduler.StepLR(
     #     optimizer, step_size=config.step_size, gamma=config.gamma
     # )
@@ -62,8 +86,10 @@ elif config.initialize == "resume":
 
     # optimizer
     # TODO: possibly overwrite lr, step_size, gamma, etc. in the config object then create the optimizer outside of this if else?
-    optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
     optimizer.load_state_dict(torch_model["optimizer"])
+    for param_group in optimizer.param_groups:
+        param_group["lr"] = args.lr
     # lr_scheduler = torch.optim.lr_scheduler.StepLR(
     #     optimizer, step_size=config.step_size, gamma=config.gamma
     # )
@@ -91,6 +117,7 @@ for epoch in range(start_epoch, config.epochs + 1):
 
     # save torch model
     if val_loss < best_val_loss:
+        best_val_loss = val_loss
         torch_model = {
             "epoch": epoch,
             "model": model.state_dict(),
@@ -101,3 +128,5 @@ for epoch in range(start_epoch, config.epochs + 1):
         }
         torch.save(torch_model, pt_path)
         print("Model saved to {}\n".format(pt_path))
+    else:
+        print("")
