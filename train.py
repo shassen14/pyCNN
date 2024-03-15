@@ -72,7 +72,6 @@ print(optimizer.param_groups[0]["lr"])
 for epoch in range(start_epoch, config.epochs + 1):
     utils.train(model, train_loader, optimizer, criterion, epoch, config.device_type)
     val_loss = utils.validate(model, val_loader, criterion, config.device_type)
-    # lr_scheduler.step()
 
     # save torch model
     if val_loss < best_val_loss:
@@ -81,7 +80,6 @@ for epoch in range(start_epoch, config.epochs + 1):
             "epoch": epoch,
             "model": model.state_dict(),
             "optimizer": optimizer.state_dict(),
-            # "lr_scheduler": lr_scheduler,
             "config": config,
             "best_val_loss": val_loss,
         }
