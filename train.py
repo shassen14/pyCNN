@@ -57,15 +57,19 @@ model.to(config.device_type)
 
 # optimizer
 # TODO: possibly overwrite lr, step_size, gamma, etc. in the config object then create the optimizer outside of this if else?
+# TODO: add in weight decay for regularization
 optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
 optimizer.load_state_dict(torch_model["optimizer"]) if args.init == "resume" else None
 for param_group in optimizer.param_groups:
     param_group["lr"] = args.lr
 
+# TODO: use args/config values
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.9)
+
 # loss criterion
 criterion = nn.CrossEntropyLoss().to(config.device_type)
 
-print("Starting Best Val Loss: {:.3f}".format(best_val_loss))
+print("Starting Best Val Loss: {:.3E}".format(best_val_loss))
 
 # training
 for epoch in range(start_epoch, config.epochs + 1):
@@ -85,4 +89,5 @@ for epoch in range(start_epoch, config.epochs + 1):
         torch.save(torch_model, pt_path)
         print("Model saved to {}\n".format(pt_path))
     else:
-        print("")
+        scheduler.step()
+        print("Reducing learning rate: {:.3E}\n".format(scheduler.get_last_lr()[0]))
