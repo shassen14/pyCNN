@@ -161,6 +161,19 @@ def validate(model, val_loader, criterion, device):
     return test_loss
 
 
+###############################################################################
+def model_validate(model, input, label, device):
+    model.eval()
+    with torch.no_grad():
+        input, label = input.to(device), label.to(device)
+        output = model(input)
+        pred = output.argmax(dim=1, keepdim=True)
+        correct = pred.eq(label.view_as(pred)).sum().item()
+
+    return pred, correct
+
+
+###############################################################################
 def train_arg_parser(
     parser: argparse.ArgumentParser, config: cfg.Config, pt_path: str
 ) -> argparse.Namespace:
