@@ -65,8 +65,7 @@ for param_group in optimizer.param_groups:
 # loss criterion
 criterion = nn.CrossEntropyLoss().to(config.device_type)
 
-print("Starting Best Val Loss: {}".format(best_val_loss))
-print(optimizer.param_groups[0]["lr"])
+print("Starting Best Val Loss: {:.3f}".format(best_val_loss))
 
 # training
 for epoch in range(start_epoch, config.epochs + 1):
