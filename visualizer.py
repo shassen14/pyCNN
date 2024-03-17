@@ -107,13 +107,7 @@ for val_images, val_labels in val_loader:
         imgplot = plt.imshow(processed[i])
         if i == 0:
             a.set_title("Label = {}".format(int(names[i])), fontsize=30)
-            a.text(
-                0.5,
-                -0.1,
-                "Prediction: {}".format("nothing"),
-                size=12,
-                ha="center",
-            )
+            plt.xlabel("Prediction: {}".format("nothing"), fontsize=30)
         else:
             a.set_title(names[i].split("(")[0], fontsize=30)
     plt.savefig(str("feature_maps.jpg"), bbox_inches="tight")
