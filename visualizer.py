@@ -2,8 +2,8 @@ import config as cfg
 import utils
 
 import sys
+import math
 import argparse
-import PIL.Image as Image
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -75,39 +75,55 @@ for i in range(len(model_children)):
                 conv_layers.append(child)
 print(f"Total convolution layers: {counter}")
 
-for val_images, val_labels in val_loader:
-    sample_image = val_images[0]  # Reshape them according to your needs.
-    sample_label = val_labels[0]
+for i, model_weight in enumerate(model_weights):
+    plt.figure(figsize=(20, 17))
+    for j, filter in enumerate(model_weight):
+        plt.subplot(
+            math.ceil(math.sqrt(len(model_weight))),
+            math.ceil(math.sqrt(len(model_weight))),
+            j + 1,
+        )
+        # plt.title("Filter {}".format(j + 1))
+        plt.imshow(filter[0, :, :].detach(), cmap="gray")
+        plt.axis("off")
 
-    # TODO: make this work
-    # pred, correct = utils.model_validate(
-    #     model, sample_image, sample_label, config.device_type
-    # )
+    # plt.savefig("filter.png")
+    plt.suptitle("Convolution Layer {}: {} filters".format(i + 1, len(model_weight)))
+plt.show()
 
-    outputs = [sample_image]
-    names = [sample_label]
-    for layer in conv_layers[0:]:
-        sample_image = layer(sample_image)
-        outputs.append(sample_image)
-        names.append(str(layer))
-    # print feature_maps
-    # for feature_map in outputs:
-    #     print(feature_map.shape)
+# for val_images, val_labels in val_loader:
+#     sample_image = val_images[0]  # Reshape them according to your needs.
+#     sample_label = val_labels[0]
 
-    processed = []
-    for feature_map in outputs:
-        feature_map = feature_map.squeeze(0)
-        gray_scale = torch.sum(feature_map, 0)
-        gray_scale = gray_scale / feature_map.shape[0]
-        processed.append(gray_scale.data.cpu().numpy())
+#     # TODO: make this work
+#     # pred, correct = utils.model_validate(
+#     #     model, sample_image, sample_label, config.device_type
+#     # )
 
-    fig = plt.figure(figsize=(30, 50))
-    for i in range(len(processed) - 1):
-        a = fig.add_subplot(5, 5, i + 1)
-        imgplot = plt.imshow(processed[i])
-        if i == 0:
-            a.set_title("Label = {}".format(int(names[i])), fontsize=30)
-            plt.xlabel("Prediction: {}".format("nothing"), fontsize=30)
-        else:
-            a.set_title(names[i].split("(")[0], fontsize=30)
-    plt.savefig(str("feature_maps.jpg"), bbox_inches="tight")
+#     outputs = [sample_image]
+#     names = [sample_label]
+#     for layer in conv_layers[0:]:
+#         sample_image = layer(sample_image)
+#         outputs.append(sample_image)
+#         names.append(str(layer))
+#     # print feature_maps
+#     # for feature_map in outputs:
+#     #     print(feature_map.shape)
+
+#     processed = []
+#     for feature_map in outputs:
+#         feature_map = feature_map.squeeze(0)
+#         gray_scale = torch.sum(feature_map, 0)
+#         gray_scale = gray_scale / feature_map.shape[0]
+#         processed.append(gray_scale.data.cpu().numpy())
+
+#     fig = plt.figure(figsize=(30, 50))
+#     for i in range(len(processed) - 1):
+#         a = fig.add_subplot(5, 5, i + 1)
+#         imgplot = plt.imshow(processed[i])
+#         if i == 0:
+#             a.set_title("Label = {}".format(int(names[i])), fontsize=30)
+#             plt.xlabel("Prediction: {}".format("nothing"), fontsize=30)
+#         else:
+#             a.set_title(names[i].split("(")[0], fontsize=30)
+#     plt.savefig(str("feature_maps.jpg"), bbox_inches="tight")
