@@ -2,6 +2,8 @@
 # virtual environment name. Change name if so desired
 VIRTUAL_ENVIRONMENT_DIR="venv"
 
+# TODO: sudo apt-get install python3-tk for visualizer in venv
+
 # check for pip and install if not installed
 REQUIRED_PIP="python3-pip"
 PIP_OK=$(dpkg-query -W -f='${Status}\n' $REQUIRED_PIP | grep 'install ok installed')

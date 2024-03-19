@@ -7,9 +7,11 @@ import torch.nn as nn
 
 
 ###############################################################################
-def get_folder_path(folder: str) -> str:
+def get_folder_path(*folders: str) -> str:
     """Obtain folder path. Side effect is creating one if it doesn't exist"""
-    folder_path = os.path.join(os.path.dirname(__file__), folder)
+    folder_path = os.path.dirname(__file__)
+    for folder in folders:
+        folder_path = os.path.join(folder_path, folder)
     os.makedirs(folder_path, exist_ok=True)
     return folder_path
 
@@ -163,6 +165,7 @@ def validate(model, val_loader, criterion, device):
 
 ###############################################################################
 def model_validate(model, input, label, device):
+    """TODO: fix this.... fix all of this"""
     model.eval()
     with torch.no_grad():
         input, label = input.to(device), label.to(device)
