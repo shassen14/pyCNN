@@ -4,6 +4,8 @@ import argparse
 import torch
 from torchvision import datasets, transforms
 import torch.nn as nn
+import matplotlib.pyplot as plt
+import math
 
 
 ###############################################################################
@@ -177,6 +179,120 @@ def model_validate(model, input, label, device):
 
 
 ###############################################################################
+def get_model_children(model: nn.Module):
+    model_weights = []
+    layers = []
+    layers_names = []
+    model_children = list(model.children())
+
+    # counter to keep count of the conv layers
+    conv_counter = 0
+    maxpool_counter = 0
+
+    # append all the conv layers and their respective wights to the list
+    for i in range(len(model_children)):
+        if type(model_children[i]) == nn.Conv2d:
+            conv_counter += 1
+            model_weights.append(model_children[i].weight)
+            layers.append(model_children[i])
+            layers_names.append(f"Convolutional Layer {conv_counter}")
+        elif type(model_children[i]) == nn.MaxPool2d:
+            maxpool_counter += 1
+            layers.append(model_children[i])
+            layers_names.append(f"Max Pool Layer {conv_counter}")
+        elif type(model_children[i]) == nn.Sequential:
+            for child in model_children[i].children():
+                if type(child) == nn.Conv2d:
+                    conv_counter += 1
+                    model_weights.append(child.weight)
+                    layers.append(child)
+                    layers_names.append(f"Convolutional Layer {conv_counter}")
+                if type(child) == nn.MaxPool2d:
+                    maxpool_counter += 1
+                    layers.append(child)
+                    layers_names.append(f"Max Pool Layer {conv_counter}")
+    print(f"Total convolution layers: {conv_counter}")
+    print(f"Total max pool layers: {maxpool_counter}")
+
+    return model_weights, layers, layers_names
+
+
+###############################################################################
+def plot_filters(
+    model_weights, filter_img_path: str, save_figures: bool, show_figures: bool
+):
+    # skip everything if doing nothing
+    if not save_figures and not show_figures:
+        print("Skipping convolutional layers plotting and saving")
+        return
+
+    # plot, save and/or show plots
+    for i, model_weight in enumerate(model_weights):
+        plt.figure(figsize=(16, 9))
+        for j, filter in enumerate(model_weight):
+            plt.subplot(
+                math.ceil(math.sqrt(len(model_weight))),
+                math.ceil(math.sqrt(len(model_weight))),
+                j + 1,
+            )
+            plt.imshow(filter[0, :, :].detach(), cmap="gray")
+            plt.axis("off")
+        plt.suptitle(
+            "Convolution Layer {}: {} filters".format(i + 1, len(model_weight)),
+            fontsize=40,
+        )
+        if save_figures:
+            plt.savefig(
+                get_file_path(filter_img_path, "conv_layer{}.png".format(i + 1))
+            )
+    if show_figures:
+        plt.show()
+
+
+###############################################################################
+def plot_feature_maps(
+    input_img,
+    layers,
+    filter_img_path: str,
+    save_figures: bool,
+    show_figures: bool,
+):
+    # skip everything if doing nothing
+    if not save_figures and not show_figures:
+        print("Skipping feature maps plotting and saving")
+        return
+
+    # plot, save and/or show plots
+    results = [input_img]
+    for i in range(0, len(layers)):
+        # pass the result from the last layer to the next layer
+        results.append(layers[i](results[-1]))
+
+    for num_layer in range(len(results)):
+        plt.figure(figsize=(30, 30))
+        layer_viz = results[num_layer][:, :, :]
+        layer_viz = layer_viz.data
+        for i, filter in enumerate(layer_viz):
+            plt.subplot(
+                math.ceil(math.sqrt(len(layer_viz))),
+                math.ceil(math.sqrt(len(layer_viz))),
+                i + 1,
+            )
+            plt.suptitle(
+                "Layer {}: Feature Maps".format(num_layer),
+                fontsize=60,
+            )
+            plt.imshow(filter, cmap="gray")
+            plt.axis("off")
+        if save_figures:
+            print(f"Saving layer {num_layer} feature maps...")
+            plt.savefig(f"{filter_img_path}/feature_map{num_layer}.png")
+    if show_figures:
+        plt.show()
+        plt.close()
+
+
+###############################################################################
 def train_arg_parser(
     parser: argparse.ArgumentParser, config: cfg.Config, pt_path: str
 ) -> argparse.Namespace:
@@ -208,5 +324,47 @@ def train_arg_parser(
         type=str,
         help="absolute path to the saved pytorch model",
         dest="init",
+    )
+    return parser.parse_args()
+
+
+###############################################################################
+def visualizer_arg_parser(
+    parser: argparse.ArgumentParser, config: cfg.Config, pt_path: str, data_path: str
+) -> argparse.Namespace:
+    """
+    args.init
+    args.pt
+    args.lr
+    """
+    parser.add_argument(
+        "-pt",
+        "--pt_path",
+        default=pt_path,
+        type=str,
+        help="absolute path to the saved pytorch model",
+        dest="pt_path",
+    )
+    parser.add_argument(
+        "-d",
+        "--data_path",
+        default=data_path,
+        type=str,
+        help="absolute path to the data directory",
+        dest="data_path",
+    )
+    parser.add_argument(
+        "-sf",
+        "--save_figures",
+        action="store_true",
+        help="If argument is included when running, figures will be saved as png to the model's assets directory",
+        dest="save_figures",
+    )
+    parser.add_argument(
+        "-pf",
+        "--plot_figures",
+        action="store_true",
+        help="If argument is included when running, figures will be shown duering runtime.",
+        dest="plot_figures",
     )
     return parser.parse_args()
