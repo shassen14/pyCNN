@@ -64,7 +64,12 @@ inputs, classes = next(iter(val_loader))
 
 # pass the image through all the layers
 utils.plot_feature_maps(
-    inputs[0], layers, filter_img_path, args.save_figures, args.plot_figures
+    inputs[0],
+    layers,
+    layers_names,
+    filter_img_path,
+    args.save_figures,
+    args.plot_figures,
 )
 
 # show plots if available

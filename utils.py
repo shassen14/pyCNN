@@ -210,7 +210,7 @@ def get_model_children(model: nn.Module):
                 if type(child) == nn.MaxPool2d:
                     maxpool_counter += 1
                     layers.append(child)
-                    layers_names.append(f"Max Pool Layer {conv_counter}")
+                    layers_names.append(f"Max Pool Layer {maxpool_counter}")
     print(f"Total convolution layers: {conv_counter}")
     print(f"Total max pool layers: {maxpool_counter}")
 
@@ -242,6 +242,7 @@ def plot_filters(
             fontsize=40,
         )
         if save_figures:
+            print(f"Saving convolutional layer {i+1}")
             plt.savefig(
                 get_file_path(filter_img_path, "conv_layer{}.png".format(i + 1))
             )
@@ -251,6 +252,7 @@ def plot_filters(
 def plot_feature_maps(
     input_img,
     layers,
+    layers_names,
     filter_img_path: str,
     save_figures: bool,
     show_figures: bool,
@@ -267,7 +269,7 @@ def plot_feature_maps(
         results.append(layers[i](results[-1]))
 
     for num_layer in range(len(results)):
-        plt.figure(figsize=(30, 30))
+        plt.figure(figsize=(30, 35))
         layer_viz = results[num_layer][:, :, :]
         layer_viz = layer_viz.data
         for i, filter in enumerate(layer_viz):
@@ -276,10 +278,17 @@ def plot_feature_maps(
                 math.ceil(math.sqrt(len(layer_viz))),
                 i + 1,
             )
-            plt.suptitle(
-                "Layer {}: Feature Maps".format(num_layer),
-                fontsize=60,
-            )
+            if num_layer == 0:
+                plt.suptitle(
+                    "Input image".format(num_layer),
+                    fontsize=60,
+                )
+                plt.imshow(filter)
+            else:
+                plt.suptitle(
+                    "{}: Feature Maps".format(layers_names[num_layer - 1]),
+                    fontsize=60,
+                )
             plt.imshow(filter, cmap="gray")
             plt.axis("off")
         if save_figures:
