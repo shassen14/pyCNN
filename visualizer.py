@@ -67,6 +67,10 @@ utils.plot_feature_maps(
     inputs[0], layers, filter_img_path, args.save_figures, args.plot_figures
 )
 
+# show plots if available
+if args.plot_figures:
+    plt.show()
+
 # for val_images, val_labels in val_loader:
 #     sample_image = val_images[0]  # Reshape them according to your needs.
 #     sample_label = val_labels[0]

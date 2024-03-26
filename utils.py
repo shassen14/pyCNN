@@ -245,8 +245,6 @@ def plot_filters(
             plt.savefig(
                 get_file_path(filter_img_path, "conv_layer{}.png".format(i + 1))
             )
-    if show_figures:
-        plt.show()
 
 
 ###############################################################################
@@ -287,9 +285,6 @@ def plot_feature_maps(
         if save_figures:
             print(f"Saving layer {num_layer} feature maps...")
             plt.savefig(f"{filter_img_path}/feature_map{num_layer}.png")
-    if show_figures:
-        plt.show()
-        plt.close()
 
 
 ###############################################################################
